@@ -58,6 +58,7 @@ io.on('connection', (socket) => {
       const newGuideRespond = await apiRespond.json();
 
       socket.emit('newGuideNotification', newGuideRespond);
+      socket.broadcast.emit('newGuideNotification', newGuideRespond);
     } catch (error) {
       console.log('ocurrio un error', error);
       socket.emit('newGuideNotification', false);
