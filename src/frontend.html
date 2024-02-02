@@ -29,7 +29,7 @@
       <div class="row mt-4 justify-content-center">
         <div class="col-md-10">
           <div class="card p-4 shadow-lg">
-            <h5>Listado de guías</h5>
+            <h5>Listado de guías: Febrero 2024</h5>
             <hr>
             <ul class="list-group" id="guidesList">
             </ul>
@@ -61,7 +61,34 @@
       const guidesList = document.getElementById("guidesList");
       const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
 
-      let currentGuides = 0;
+      let currentGuidesCounter = 0;
+      let currentGuides = [];
+
+      const getCurrentGuides = async () => {
+        try {
+          const currentGuidesRespond = await fetch(`/getCurrentGuides`);
+          const currentGuides = await currentGuidesRespond.json();
+
+          currentGuides.forEach(guide => {
+            renderNewListItem(guide.tracking_number, guide.name);
+          });
+        } catch (error) {
+          console.error('ocurrio un erro al intentar obtener las guias', error);
+        }
+      };
+
+      const renderNewListItem = (trackingNumber, carrier) => {
+        const newListItem = document.createElement("li");
+
+        newListItem.classList.add('list-group-item');
+        newListItem.appendChild(document.createTextNode(`TrackingNumber: ${trackingNumber} - Carrier: ${carrier}`));
+        guidesList.appendChild(newListItem);
+        
+        currentGuidesCounter += 1;
+        counter.innerHTML = currentGuidesCounter;
+      };
+
+      getCurrentGuides();
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -83,14 +110,8 @@
         }
 
         const newGuide = newGuideResponse.data[0];
-        const newListItem = document.createElement("li");
 
-        newListItem.classList.add('list-group-item');
-        newListItem.appendChild(document.createTextNode(`TrackingNumber: ${newGuide.trackingNumber} - Carrier: ${newGuide.carrier}`));
-        guidesList.appendChild(newListItem);
-        
-        currentGuides += 1;
-        counter.innerHTML = currentGuides;
+        renderNewListItem(newGuide.trackingNumber, newGuide.carrier);
       });
     </script>
   </body>
