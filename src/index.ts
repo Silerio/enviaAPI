@@ -12,11 +12,38 @@ const httpServer = createServer(app);
 const port = process.env.PORT || 3030;
 const io = new Server(httpServer);
 
+// Endpoint para generar el frontend
 app.get("/", (req: Request, res: Response) => {
   res.sendFile(join(__dirname, 'frontend.html'));
 });
 
+// Endpoint para obtener todas las guías generadas actualmente
+app.get("/getCurrentGuides", async (req: Request, res: Response) => {
+  try {
+    const apiRespond = await fetch(`${process.env.API_ENVIA_BASE_URL_QUERIES}/guide/02/2024`, {
+      method: 'GET',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${process.env.API_ENVIA_KEY}`,
+      },
+    });
+
+    const currentGuides = await apiRespond.json();
+
+    if(currentGuides.data){
+      res.json(currentGuides.data);
+      return;
+    }
+
+    res.json([]);
+  } catch (error) {
+    console.log('ocurrio un error', error);
+    res.json([]);
+  }
+});
+
 io.on('connection', (socket) => {
+  // Web Socket que se ejecuta al intentar agregar una nueva guía
   socket.on('addGuide', async () => {
     try {
       const apiRespond = await fetch(`${process.env.API_ENVIA_BASE_URL}/ship/generate/`, {
@@ -30,7 +57,6 @@ io.on('connection', (socket) => {
 
       const newGuideRespond = await apiRespond.json();
 
-      console.log('newGuide', newGuideRespond);
       socket.emit('newGuideNotification', newGuideRespond);
     } catch (error) {
       console.log('ocurrio un error', error);
@@ -49,11 +75,12 @@ io.on('connection', (socket) => {
   aunque me hubiera gustado agregarlo.
 
   app.get("/webhook", (req: Request, res: Response) => {
-    console.log('webhook has been reach');
+    console.log('webhook alcanzado');
     console.log(req);
   });
 */
 
+// Exponer puerto para servicios HTTP
 httpServer.listen(port, () => {
   console.log(`[server]: Servicios ejecutandose en: http://localhost:${port}`);
 });
