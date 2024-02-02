@@ -9,15 +9,45 @@
   <body>
     <div class="container">
       <div class="row mt-4 justify-content-center">
-        <div class="col-10">
-          <h3 class="mb-4">Contador API</h3>
-          <form id="form" action="">
-            <div class="mb-3">
-              <label class="form-label" for="guideInput">Escribe un nuevo número de guía</label>
-              <input class="form-control" id="guideInput" placeholder="Ejemplo: GUIA#000">
+        <div class="col-md-10">
+          <h5>Contador de guías - API: ENVIA.COM</h5>
+          <hr>
+          <div class="card p-4 shadow-lg">
+            <form id="form" action="">
+              <div class="row justify-content-center">
+                <div class="col-auto">
+                  <button type="submit" class="btn btn-primary">Generar guía</button>
+                </div>
+                <div class="col-auto">
+                  <h2>Guías generadas: <span class="text-success" id="counter">0</span></h2>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="row mt-4 justify-content-center">
+        <div class="col-md-10">
+          <div class="card p-4 shadow-lg">
+            <h5>Listado de guías</h5>
+            <hr>
+            <ul class="list-group" id="guidesList">
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal fade" data-bs-backdrop="static" id="notificationModal" tabindex="-1" aria-labelledby="notificationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h1 class="modal-title fs-5" id="notificationModalLabel">Generando nueva guía</h1>
             </div>
-            <button type="submit" class="btn btn-primary">Generar guía</button>
-          </form>
+            <div class="modal-body">
+              <span class="text-primary">
+                Porfavor espera en lo que generamos una nueva guía para ti ...
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -26,22 +56,41 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
       const socket = io();
-
       const form = document.getElementById('form');
-      const input = document.getElementById('guideInput');
+      const counter = document.getElementById('counter');
+      const guidesList = document.getElementById("guidesList");
+      const notificationModal = new bootstrap.Modal(document.getElementById('notificationModal'));
 
-      form.addEventListener('submit', (e) => {
+      let currentGuides = 0;
+
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
-        console.log('g');
-
-        if (input.value) {
-          socket.emit('addGuide', input.value);
-          input.value = '';
-        }
+        notificationModal.show();
+        socket.emit('addGuide');
       });
 
-      socket.on('newGuideNotification', (newGuide) => {
-        alert(newGuide);
+      socket.on('newGuideNotification', (newGuideResponse) => {
+        notificationModal.hide();
+
+        if(!newGuideResponse){
+          alert('ocurrio un error al intentar agregar la guía');
+          return;
+        }
+
+        if(newGuideResponse.error){
+          alert(`Error: ${newGuideResponse?.error?.message}`);
+          return;
+        }
+
+        const newGuide = newGuideResponse.data[0];
+        const newListItem = document.createElement("li");
+
+        newListItem.classList.add('list-group-item');
+        newListItem.appendChild(document.createTextNode(`TrackingNumber: ${newGuide.trackingNumber} - Carrier: ${newGuide.carrier}`));
+        guidesList.appendChild(newListItem);
+        
+        currentGuides += 1;
+        counter.innerHTML = currentGuides;
       });
     </script>
   </body>
