@@ -1,0 +1,57 @@
+{
+  "origin": {
+    "name": "oscar mx",
+    "company": "oskys factory",
+    "email": "osgosf8@gmail.com",
+    "phone": "8116300800",
+    "street": "av vasconcelos",
+    "number": "1400",
+    "district": "mirasierra",
+    "city": "Monterrey",
+    "state": "NL",
+    "country": "MX",
+    "postalCode": "66236",
+    "reference": ""
+  },
+  "destination": {
+    "name": "oscar",
+    "company": "empresa",
+    "email": "osgosf8@gmail.com",
+    "phone": "8116300800",
+    "street": "av vasconcelos",
+    "number": "1400",
+    "district": "palo blanco",
+    "city": "monterrey",
+    "state": "NL",
+    "country": "MX",
+    "postalCode": "66240",
+    "reference": ""
+  },
+  "packages": [
+    {
+      "content": "camisetas rojas",
+      "amount": 2,
+      "type": "box",
+      "dimensions": {
+        "length": 1,
+        "width": 17,
+        "height": 2
+      },
+      "weight": 5,
+      "insurance": 400,
+      "declaredValue": 400,
+      "weightUnit": "KG",
+      "lengthUnit": "CM"
+    }
+  ],
+  "shipment": {
+    "carrier": "dhl",
+    "service": "express",
+    "type": 1
+  },
+  "settings": {
+    "printFormat": "PDF",
+    "printSize": "STOCK_4X6",
+    "comments": "comentarios de el envío"
+  }
+}
